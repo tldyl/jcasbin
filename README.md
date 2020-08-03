@@ -22,10 +22,10 @@ jCasbin is a powerful and efficient open-source access control library for Java 
 [Casbin](https://github.com/casbin/casbin) | [jCasbin](https://github.com/casbin/jcasbin) | [node-Casbin](https://github.com/casbin/node-casbin) | [PHP-Casbin](https://github.com/php-casbin/php-casbin)
 production-ready | production-ready | production-ready | production-ready
 
-[![python](https://casbin.org/img/langs/python.png)](https://github.com/casbin/pycasbin) | [![dotnet](https://casbin.org/img/langs/dotnet.png)](https://github.com/casbin-net/Casbin.NET) | [![delphi](https://casbin.org/img/langs/delphi.png)](https://github.com/casbin4d/Casbin4D) | [![rust](https://casbin.org/img/langs/rust.png)](https://github.com/casbin/casbin-rs)
+[![python](https://casbin.org/img/langs/python.png)](https://github.com/casbin/pycasbin) | [![dotnet](https://casbin.org/img/langs/dotnet.png)](https://github.com/casbin-net/Casbin.NET) | [![c++](https://casbin.org/img/langs/cpp.png)](https://github.com/casbin/casbin-cpp) | [![rust](https://casbin.org/img/langs/rust.png)](https://github.com/casbin/casbin-rs)
 ----|----|----|----
-[PyCasbin](https://github.com/casbin/pycasbin) | [Casbin.NET](https://github.com/casbin-net/Casbin.NET) | [Casbin4D](https://github.com/casbin4d/Casbin4D) | [Casbin-RS](https://github.com/casbin/casbin-rs)
-production-ready | production-ready | experimental | production-ready
+[PyCasbin](https://github.com/casbin/pycasbin) | [Casbin.NET](https://github.com/casbin-net/Casbin.NET) | [Casbin-CPP](https://github.com/casbin/casbin-cpp) | [Casbin-RS](https://github.com/casbin/casbin-rs)
+production-ready | production-ready | beta-test | production-ready
 
 ## Table of contents
 
@@ -108,7 +108,7 @@ What jCasbin does:
 What jCasbin does NOT do:
 
 1. authentication (aka verify ``username`` and ``password`` when a user logs in)
-2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and jCasbin is not designed as a password container. However, jCasbin stores the user-role mapping for the RBAC scenario. 
+2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and jCasbin is not designed as a password container. However, jCasbin stores the user-role mapping for the RBAC scenario.
 
 ## Installation
 
@@ -118,7 +118,7 @@ For Maven:
 <dependency>
   <groupId>org.casbin</groupId>
   <artifactId>jcasbin</artifactId>
-  <version>1.4.0</version>
+  <version>1.5.0</version>
 </dependency>
 ```
 
@@ -217,19 +217,20 @@ https://casbin.org/docs/en/adopters
 
 We provide Spring Boot support, you can use [casbin-spring-boot-starter](https://github.com/jcasbin/casbin-spring-boot-starter) to quickly develop in SpringBoot
 
-In casbin-spring-boot-starter, we made the following adjustments.
-1. Rewrite JDBCAdapter to support a variety of commonly used JDBC databases 
-2. Implement RedisWatcher 
-4. IDEA Editor Configuration Tips 
-5. Provide default configuration, automatic assembly
-6. SpringSecurity integration (future) 
-7. Shiro integration (future) 
+In casbin-spring-boot-starter, we made the following adjustments:
+
+1. Rewrite JDBCAdapter to support a variety of commonly used JDBC databases
+2. Implement RedisWatcher
+3. IDEA Editor Configuration Tips
+4. Provide default configuration, automatic assembly
+5. SpringSecurity integration (future)
+6. Shiro integration (future)
 
 https://github.com/jcasbin/casbin-spring-boot-starter
 
 ## Contributors
 
-This project exists thanks to all the people who contribute. 
+This project exists thanks to all the people who contribute.
 <a href="https://github.com/casbin/jcasbin/graphs/contributors"><img src="https://opencollective.com/jcasbin/contributors.svg?width=890&button=false" /></a>
 
 ## Backers
