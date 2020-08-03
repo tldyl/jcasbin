@@ -1,3 +1,0 @@
-[submodule "hibernate-adapter"]
-	path = hibernate-adapter
-	url = https://github.com/tldyl/hibernate-adapter.git
