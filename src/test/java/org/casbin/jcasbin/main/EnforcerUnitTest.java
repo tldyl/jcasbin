@@ -495,19 +495,6 @@ public class EnforcerUnitTest {
         }
     }
 
-    @Test
-    public void testGetPolicyWithModelEmpty() {
-        Enforcer enforcer = new Enforcer("examples/basic_model.conf", "examples/basic_policy.csv");
-        List<List<String>> result = null;
-        try {
-            result = enforcer.getPolicy();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        assert result != null;
-    }
-
-    @Test
     public void testMultilineModel() {
         Enforcer enforcer = new Enforcer("examples/multiline_model.conf", "examples/multiline_policy.csv");
         testDomainEnforce(enforcer, "alice", "domain1", "data1", "read", true);
