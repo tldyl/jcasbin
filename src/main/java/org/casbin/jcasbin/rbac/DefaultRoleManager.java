@@ -53,7 +53,6 @@ public class DefaultRoleManager implements RoleManager {
      * e.loadPolicy();
      * </pre>
      *
-     *
      * @param maxHierarchyLevel the maximized allowed RBAC hierarchy level.
      * @param matchingFunc a matcher for supporting pattern in g
      * @param domainMatchingFunc a matcher for supporting domain pattern in g

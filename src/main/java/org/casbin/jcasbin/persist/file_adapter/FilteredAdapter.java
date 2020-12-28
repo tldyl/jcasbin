@@ -19,7 +19,7 @@ import java.util.List;
  * @author tldyl
  * @since 2020/6/8
  */
-public class FilteredAdapter implements Adapter {
+public class FilteredAdapter implements org.casbin.jcasbin.persist.FilteredAdapter {
     private Adapter adapter;
     private boolean isFiltered = true;
     private String filepath;
@@ -35,6 +35,7 @@ public class FilteredAdapter implements Adapter {
      * @param filter the filter used to specify which type of policy should be loaded.
      * @throws CasbinAdapterException if the file path or the type of the filter is incorrect.
      */
+    @Override
     public void loadFilteredPolicy(Model model, Object filter) throws CasbinAdapterException {
         if ("".equals(filepath)) {
             throw new CasbinAdapterException("Invalid file path, file path cannot be empty.");
@@ -63,7 +64,9 @@ public class FilteredAdapter implements Adapter {
             List<String> lines = IOUtils.readLines(fis, Charset.forName("UTF-8"));
             for (String line : lines) {
                 line = line.trim();
-                if (filterLine(line, filter)) continue;
+                if (filterLine(line, filter)) {
+                    continue;
+                }
                 handler.accept(line, model);
             }
         } catch (IOException e) {
@@ -75,9 +78,13 @@ public class FilteredAdapter implements Adapter {
      * match the line.
      */
     private boolean filterLine(String line, Filter filter) {
-        if (filter == null) return false;
+        if (filter == null) {
+            return false;
+        }
         String[] p = line.split(",");
-        if (p.length == 0) return true;
+        if (p.length == 0) {
+            return true;
+        }
         String[] filterSlice = null;
         switch (p[0].trim()) {
             case "p":
@@ -87,7 +94,9 @@ public class FilteredAdapter implements Adapter {
                 filterSlice = filter.g;
                 break;
         }
-        if (filterSlice == null) filterSlice = new String[]{};
+        if (filterSlice == null) {
+            filterSlice = new String[]{};
+        }
         return filterWords(p, filterSlice);
     }
 
@@ -95,7 +104,9 @@ public class FilteredAdapter implements Adapter {
      * match the words in the specific line.
      */
     private boolean filterWords(String[] line, String[] filter) {
-        if (line.length < filter.length + 1) return true;
+        if (line.length < filter.length + 1) {
+            return true;
+        }
         boolean skipLine = false;
         int i = 0;
         for (String s : filter) {
@@ -111,6 +122,7 @@ public class FilteredAdapter implements Adapter {
     /**
      * @return true if have any filter roles.
      */
+    @Override
     public boolean isFiltered(){
         return isFiltered;
     }

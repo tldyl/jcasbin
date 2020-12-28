@@ -27,6 +27,7 @@ import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.FunctionMap;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
+import org.casbin.jcasbin.persist.Dispatcher;
 import org.casbin.jcasbin.persist.WatcherEx;
 import org.casbin.jcasbin.persist.file_adapter.FilteredAdapter;
 import org.casbin.jcasbin.persist.Watcher;
@@ -51,11 +52,13 @@ public class CoreEnforcer {
     Adapter adapter;
     Watcher watcher;
     RoleManager rm;
+    Dispatcher dispatcher;
 
     private boolean enabled;
     boolean autoSave;
     boolean autoBuildRoleLinks;
     boolean autoNotifyWatcher = true;
+    boolean autoNotifyDispatcher = true;
 
     // cached instance of AviatorEvaluatorInstance
     AviatorEvaluatorInstance aviatorEval;
@@ -71,6 +74,7 @@ public class CoreEnforcer {
         enabled = true;
         autoSave = true;
         autoBuildRoleLinks = true;
+        dispatcher = null;
     }
 
     /**
@@ -176,6 +180,15 @@ public class CoreEnforcer {
     public void setWatcher(Watcher watcher) {
         this.watcher = watcher;
         watcher.setUpdateCallback(this::loadPolicy);
+    }
+
+    /**
+     * setDispatcher sets the current dispatcher.
+     *
+     * @param dispatcher jCasbin dispatcher
+     */
+    public void setDispatcher(Dispatcher dispatcher) {
+        this.dispatcher = dispatcher;
     }
 
     /**
@@ -331,34 +344,36 @@ public class CoreEnforcer {
         if (!enabled) {
             return true;
         }
-
         if (aviatorEval == null || modelModCount != model.getModCount()) {
-            // AviatorEvaluator instance must be rebuild
-            Map<String, AviatorFunction> functions = new HashMap<>();
-            for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
-                String key = entry.getKey();
-                AviatorFunction function = entry.getValue();
+            synchronized (this) {
+                if (aviatorEval == null || modelModCount != model.getModCount()) {
+                    // AviatorEvaluator instance must be rebuild
+                    Map<String, AviatorFunction> functions = new HashMap<>();
+                    for (Map.Entry<String, AviatorFunction> entry : fm.fm.entrySet()) {
+                        String key = entry.getKey();
+                        AviatorFunction function = entry.getValue();
 
-                functions.put(key, function);
-            }
-            if (model.model.containsKey("g")) {
-                for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
-                    String key = entry.getKey();
-                    Assertion ast = entry.getValue();
+                        functions.put(key, function);
+                    }
+                    if (model.model.containsKey("g")) {
+                        for (Map.Entry<String, Assertion> entry : model.model.get("g").entrySet()) {
+                            String key = entry.getKey();
+                            Assertion ast = entry.getValue();
 
-                    RoleManager rm = ast.rm;
-                    functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                            RoleManager rm = ast.rm;
+                            functions.put(key, BuiltInFunctions.generateGFunction(key, rm));
+                        }
+                    }
+
+                    aviatorEval = AviatorEvaluator.newInstance();
+                    for (AviatorFunction f : functions.values()) {
+                        aviatorEval.addFunction(f);
+                    }
+
+                    modelModCount = model.getModCount();
                 }
             }
-
-            aviatorEval = AviatorEvaluator.newInstance();
-            for (AviatorFunction f : functions.values()) {
-                aviatorEval.addFunction(f);
-            }
-
-            modelModCount = model.getModCount();
         }
-
         String expString = model.model.get("m").get("m").value;
         Expression expression = aviatorEval.compile(expString, true);
 
@@ -457,7 +472,7 @@ public class CoreEnforcer {
 
         return result;
     }
-    
+
     private void getRTokens(Map<String, Object> parameters, Object ...rvals) {
       for(String rKey : model.model.get("r").keySet()) {
         if(!(rvals.length == model.model.get("r").get(rKey).tokens.length)) { continue; }
@@ -465,7 +480,7 @@ public class CoreEnforcer {
           String token = model.model.get("r").get(rKey).tokens[j];
           parameters.put(token, rvals[j]);
         }
-   
+
       }
     }
 
@@ -504,5 +519,13 @@ public class CoreEnforcer {
 
     public void setAutoNotifyWatcher(boolean autoNotifyWatcher) {
         this.autoNotifyWatcher = autoNotifyWatcher;
+    }
+
+    public boolean isAutoNotifyDispatcher() {
+        return autoNotifyDispatcher;
+    }
+
+    public void setAutoNotifyDispatcher(boolean autoNotifyDispatcher) {
+        this.autoNotifyDispatcher = autoNotifyDispatcher;
     }
 }
